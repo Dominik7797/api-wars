@@ -1,13 +1,20 @@
-function getPlanet(url, index, nextLink) {
+// Selecting the modals
+let modal = document.getElementById('myModal');
+let modalInside = document.querySelector('.modal-content')
+let closeModal = document.querySelector('.closeModal')
+
+function getTable(url, index) {
     actualUrl = url + index.toString();
     fetch(actualUrl)  // set the path; the method is GET by default, but can be modified with a second parameter
         .then((response) => response.json())  // parse JSON format into JS object
         .then((data) => {
-            let body = document.getElementsByTagName('body')[0];
-            let tbl = document.createElement('table');
-            tbl.style.width = '100%';
-            tbl.setAttribute('border', '1');
-            let tbdy = document.createElement('tbody');
+            // creating the table
+            let createBody = document.getElementsByTagName('body')[0];
+            let createTable = document.createElement('table');
+            createTable.style.width = '100%';
+            createTable.setAttribute('border', '1');
+            let endOfBody = document.createElement('tbody');
+            // deleting not needed columns of data.
             for (let i in data.results) {
                 delete data.results[i]["rotation_period"]
                 delete data.results[i]["orbital_period"]
@@ -17,85 +24,92 @@ function getPlanet(url, index, nextLink) {
                 delete data.results[i]["url"]
                 delete data.results[i]["edited"]
             }
-            const values = Object.values(data.results[0]);
+            const dataResults = Object.values(data.results[0]);
+            // creating the table rows based on how many rows of data in dataResults
             for (row in data.results) {
-                let tr = document.createElement('tr');
-                tr.setAttribute('id', 'row' + row);
-                for (col in values) {
-                    let td = document.createElement('td');
-                    td.setAttribute('id', 'cell' + col);
-                    tr.appendChild(td)
-                    const values = Object.values(data.results[row]);
+                let rowOfTable = document.createElement('tr');
+                rowOfTable.setAttribute('id', 'row' + row);
+                // creating the table columns based on how many rows of data in dataResults
+                for (col in dataResults) {
+                    let colOfTable = document.createElement('td');
+                    colOfTable.setAttribute('id', 'cell' + col);
+                    rowOfTable.appendChild(colOfTable)
+                    const dataResultsPerRow = Object.values(data.results[row]);
+                    // Checking for resident cols
                     if (col == 6) {
-                        if (values[col].length == 0) {
-                            td.innerHTML = 'No known residents'
-                        } else {
-                            let button = document.createElement('button');
-                            let link = document.createElement('a');
-                            link.setAttribute('class', 'invisible');
-                            button.append(values[col].length);
-                            td.appendChild(button);
-                            const residents = Object.values(data.results[row]['residents'])
-                            let arrayLength = residents.length;
+                        // This happen if there is no data in dataResultsPerRow.
+                        if (dataResultsPerRow[col].length == 0) {
+                            colOfTable.innerHTML = 'No known residents'
+                        }
+                        // Generates the links of residents and adds <a> tag and a button
+                        else {
+                            let residentButton = document.createElement('button');
+                            residentButton.setAttribute('class', 'buttons')
+                            let residentLinks = document.createElement('a');
+                            residentLinks.setAttribute('class', 'invisible');
+                            residentButton.append(dataResultsPerRow[col].length);
+                            colOfTable.appendChild(residentButton);
+                            const dataOfResidentInRows = Object.values(data.results[row]['residents'])
+                            let arrayLength = dataOfResidentInRows.length;
                             for (let i = 0; i < arrayLength; i++) {
-                                link.append(residents[i]);
-                                button.appendChild(link);
+                                residentLinks.append(dataOfResidentInRows[i]);
+                                residentButton.appendChild(residentLinks);
                             }
-                            let modal = document.getElementById('myModal');
-                            let modalInside = document.querySelector('.modal-content')
-                            let closemodal = document.querySelector('.closeModal')
-                            button.addEventListener('click', function () {
-                                modal.style.display = "block";
-                                for (let linkResidents of residents) {
-                                    console.log(linkResidents)
-                                    fetch(linkResidents)  // set the path; the method is GET by default, but can be modified with a second parameter
-                                        .then((response) => response.json())  // parse JSON format into JS object
-                                        .then((residentData) => {
-                                            //tablazat
-                                            const residentValues = Object.values(residentData);
-                                            for (row in residentData) {
-                                                console.log(residentValues);
-                                                let trmod = document.createElement('tr');
-                                                trmod.setAttribute('id', 'row' + row);
-                                                for (col in residentData) {
-                                                    let tdmod = document.createElement('td');
-                                                    tdmod.setAttribute('id', 'cell' + col);
-                                                    trmod.appendChild(tdmod)
-                                                }
-                                            }
-                                            modalInside.append(residentValues);
-                                            modalInside.appendChild(trmod);
-
-                                        })
-                                }
-                            });
-                            closemodal.addEventListener('click', function () {
-                                modal.style.display = 'none';
-                            });
-
+                            funcModal(residentButton, dataOfResidentInRows)
                         }
                     } else {
-                        td.innerHTML = values[col].toString();
+                        colOfTable.innerHTML = dataResultsPerRow[col].toString();
                     }
                 }
-                tbdy.appendChild(tr);
+                endOfBody.appendChild(rowOfTable);
             }
-            tbl.appendChild(tbdy);
-            body.appendChild(tbl);
-            nextLink.link = data.results;
-        });
+            createTable.appendChild(endOfBody);
+            createBody.appendChild(createTable);
+        })
 }
 
-let nextLink = {};
+function funcModal(residentButton, dataOfResidentInRows) {
+    // This func will create a table in modal
+    residentButton.addEventListener('click', function () {
+        modal.style.display = "block";
+        for (let linkOfResidents of dataOfResidentInRows) {
+            fetch(linkOfResidents)  // set the path; the method is GET by default, but can be modified with a second parameter
+                .then((response) => response.json())  // parse JSON format into JS object
+                .then((residentData) => {
+                    let tableOfModal = document.createElement('table')
+                    modalInside.appendChild(tableOfModal);
+                    for (linkRow in residentData) {
+                        const residentValuesOfResidentData = Object.values(residentData);
+                        console.log(residentValuesOfResidentData)
+                        let tableRowOfModal = document.createElement('tr');
+                        tableOfModal.appendChild(tableRowOfModal);
+                        tableRowOfModal.setAttribute('id', 'row' + linkRow);
+                        for (linkCol in residentData) {
+                            let tableColOfModal = document.createElement('td');
+                            tableColOfModal.setAttribute('id', 'cell' + linkCol);
+                            tableRowOfModal.appendChild(tableColOfModal)
+                            tableColOfModal.innerHTML = residentValuesOfResidentData;
+                        }
+                    }
+
+                })
+        }
+    });
+    closeModal.addEventListener('click', function () {
+        modal.style.display = 'none';
+    });
+}
+
+
 let index = 0;
-getPlanet('https://swapi.dev/api/planets/?page=', ++index, nextLink);
+getTable('https://swapi.dev/api/planets/?page=', ++index);
 document.querySelector('#nextPage').addEventListener('click', function () {
     if (index < 6) {
         let tableBody = document.querySelector('tbody');
         let stable = document.querySelector('table');
         stable.remove();
         tableBody.remove();
-        getPlanet('https://swapi.dev/api/planets/?page=', ++index, nextLink);
+        getTable('https://swapi.dev/api/planets/?page=', ++index);
     }
 })
 document.querySelector('#back').addEventListener('click', function () {
@@ -104,6 +118,6 @@ document.querySelector('#back').addEventListener('click', function () {
         let stable = document.querySelector('table');
         stable.remove();
         tableBody.remove();
-        getPlanet('https://swapi.dev/api/planets/?page=', --index, nextLink);
+        getTable('https://swapi.dev/api/planets/?page=', --index);
     }
 })

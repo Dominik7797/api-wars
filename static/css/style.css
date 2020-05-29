@@ -47,7 +47,6 @@ button:focus {
   background-color: rgb(0,0,0); /* Fallback color */
   background-color: grey; /* Black w/ opacity */
 }
-
 /* Modal Content/Box */
 .modal-content {
   background-color: #fefefe;
@@ -56,7 +55,6 @@ button:focus {
   border: 1px solid #888;
   width: 80%; /* Could be more or less, depending on screen size */
 }
-
 /* The Close Button */
 span.close {
   color: #aaa;
@@ -70,7 +68,7 @@ span.close {
 }
 .modal {
   display: none;
-  position: fixed;/* Stay in place /
+  position: fixed; Stay in place
   z-index: 1; / Sit on top /
   margin-left: 33%;
   margin-top: 200px;
@@ -80,8 +78,6 @@ span.close {
   background-color: rgb(0,0,0); / Fallback color /
   background-color: grey; / Black w/ opacity /
 }
-
-/ Modal Content/Box /
 .modal-content {
   background-color: #fefefe;
   margin: 15% auto; / 15% from the top and centered /
@@ -89,8 +85,6 @@ span.close {
   border: 1px solid #888;
   width: 80%; / Could be more or less, depending on screen size /
 }
-
-/ The Close Button */
 span.close {
   color: #aaa;
   float: right;
