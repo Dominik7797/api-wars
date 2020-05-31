@@ -72,8 +72,8 @@ span.close {
   z-index: 1; / Sit on top /
   margin-left: 33%;
   margin-top: 200px;
-  width: 480px; / Full width /
-  height: 200px; / Full height /
+  width: 680px;
+  height: 200px;
   overflow: auto; / Enable scroll if needed /
   background-color: rgb(0,0,0); / Fallback color /
   background-color: grey; / Black w/ opacity /
@@ -90,4 +90,14 @@ span.close {
   float: right;
   font-size: 28px;
   font-weight: bold;
+}
+
+.tableOfModal {
+    width: 80%;
+}
+
+.modalHead {
+    border: 2px solid rgb(200, 200, 200);
+    font-weight: bold;
+    text-transform: capitalize;
 }

@@ -1,19 +1,40 @@
 // Selecting the modals
-let modal = document.getElementById('myModal');
-let modalInside = document.querySelector('.modal-content')
-let closeModal = document.querySelector('.closeModal')
+function createModal() {
+    let createModal = document.createElement('div');
+    createModal.setAttribute('id', 'myModal');
+    createModal.setAttribute('class', 'modal');
+    let createModalInside = document.createElement('div');
+    createModalInside.setAttribute('class', 'modal-content');
+    createModal.appendChild(createModalInside);
+    let createModalButtonClose = document.createElement('class');
+    createModalButtonClose.setAttribute('class', 'closeModal');
+    createModalButtonClose.innerHTML = 'Close';
+    createModalInside.appendChild(createModalButtonClose);
+    let createModalTable = document.createElement('table');
+    createModalTable.setAttribute('class', 'tableOfModal');
+    createModalInside.appendChild(createModalTable);
+    let getBody = document.querySelector('body');
+    getBody.appendChild(createModal);
 
+}
+
+function closeModal() {
+    let modal = document.getElementById('myModal');
+    let closeModal = document.querySelector('.closeModal');
+    closeModal.addEventListener('click', function () {
+        modal.style.display = 'none';
+        deleteHeader()
+    })
+}
 function getTable(url, index) {
     actualUrl = url + index.toString();
     fetch(actualUrl)  // set the path; the method is GET by default, but can be modified with a second parameter
         .then((response) => response.json())  // parse JSON format into JS object
         .then((data) => {
             // creating the table
-            let createBody = document.getElementsByTagName('body')[0];
+            let getBody = document.getElementsByTagName('body')[0];
             let createTable = document.createElement('table');
-            createTable.style.width = '100%';
-            createTable.setAttribute('border', '1');
-            let endOfBody = document.createElement('tbody');
+            let endOfTableBody = document.createElement('tbody');
             // deleting not needed columns of data.
             for (let i in data.results) {
                 delete data.results[i]["rotation_period"]
@@ -61,63 +82,88 @@ function getTable(url, index) {
                         colOfTable.innerHTML = dataResultsPerRow[col].toString();
                     }
                 }
-                endOfBody.appendChild(rowOfTable);
+                endOfTableBody.appendChild(rowOfTable);
             }
-            createTable.appendChild(endOfBody);
-            createBody.appendChild(createTable);
+            createTable.appendChild(endOfTableBody);
+            getBody.appendChild(createTable);
         })
+}
+
+function deleteHeader() {
+    let tableOfModal = document.querySelector(".modal");
+    tableOfModal.remove()
+    createModal()
 }
 
 function funcModal(residentButton, dataOfResidentInRows) {
     // This func will create a table in modal
+    let modal = document.querySelector('.modal');
     residentButton.addEventListener('click', function () {
         modal.style.display = "block";
+        let headerList = ["name", "height", "mass", "skin color", "hair color", "eye color", "birth year", "gender"]
+        let headerRow = document.createElement("tr")
+        headerRow.setAttribute("class", "modalHead")
+        let createTableOfModal = document.createElement("table");
+        createTableOfModal.setAttribute('class', 'tableOfModal');
+        let tableOfModal = document.querySelector('.tableOfModal')
+        tableOfModal.appendChild(headerRow);
+        for (let headerData of headerList) {
+            let hdm = document.createElement("td");
+            headerRow.appendChild(hdm);
+            hdm.innerHTML = headerData;
+        }
         for (let linkOfResidents of dataOfResidentInRows) {
             fetch(linkOfResidents)  // set the path; the method is GET by default, but can be modified with a second parameter
                 .then((response) => response.json())  // parse JSON format into JS object
                 .then((residentData) => {
-                    let tableOfModal = document.createElement('table')
-                    modalInside.appendChild(tableOfModal);
-                    for (linkRow in residentData) {
-                        const residentValuesOfResidentData = Object.values(residentData);
-                        console.log(residentValuesOfResidentData)
-                        let tableRowOfModal = document.createElement('tr');
-                        tableOfModal.appendChild(tableRowOfModal);
-                        tableRowOfModal.setAttribute('id', 'row' + linkRow);
-                        for (linkCol in residentData) {
-                            let tableColOfModal = document.createElement('td');
-                            tableColOfModal.setAttribute('id', 'cell' + linkCol);
-                            tableRowOfModal.appendChild(tableColOfModal)
-                            tableColOfModal.innerHTML = residentValuesOfResidentData;
-                        }
+                    let residentValuesOfResidentData = Object.values(residentData);
+                    residentValuesOfResidentData = residentValuesOfResidentData.slice(0, 8);
+                    let rowModal = document.createElement("tr")
+                    rowModal.setAttribute("class", "modalTableProperties")
+                    for (let residentValues of residentValuesOfResidentData) {
+                        let td = document.createElement('td')
+                        rowModal.appendChild(td)
+                        let tableOfModal = document.querySelector(".tableOfModal");
+                        tableOfModal.appendChild(rowModal)
+                        td.innerHTML = residentValues;
                     }
-
                 })
         }
     });
-    closeModal.addEventListener('click', function () {
-        modal.style.display = 'none';
-    });
 }
 
-
 let index = 0;
-getTable('https://swapi.dev/api/planets/?page=', ++index);
-document.querySelector('#nextPage').addEventListener('click', function () {
-    if (index < 6) {
-        let tableBody = document.querySelector('tbody');
-        let stable = document.querySelector('table');
-        stable.remove();
-        tableBody.remove();
-        getTable('https://swapi.dev/api/planets/?page=', ++index);
-    }
-})
-document.querySelector('#back').addEventListener('click', function () {
-    if (index > 1) {
-        let tableBody = document.querySelector('tbody');
-        let stable = document.querySelector('table');
-        stable.remove();
-        tableBody.remove();
-        getTable('https://swapi.dev/api/planets/?page=', --index);
-    }
-})
+
+function getNextPage() {
+    document.querySelector('#nextPage').addEventListener('click', function () {
+        if (index < 6) {
+            let tableBody = document.querySelector('tbody');
+            let stable = document.querySelector('table');
+            stable.remove();
+            tableBody.remove();
+            getTable('https://swapi.dev/api/planets/?page=', ++index);
+        }
+    })
+}
+
+function getPreviousPage() {
+    document.querySelector('#back').addEventListener('click', function () {
+        if (index > 1) {
+            let tableBody = document.querySelector('tbody');
+            let stable = document.querySelector('table');
+            stable.remove();
+            tableBody.remove();
+            getTable('https://swapi.dev/api/planets/?page=', --index);
+        }
+    })
+}
+
+function init() {
+    createModal()
+    getTable('https://swapi.dev/api/planets/?page=', ++index);
+    getNextPage();
+    closeModal();
+    getPreviousPage();
+}
+
+init();
